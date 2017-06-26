@@ -1,11 +1,11 @@
 var tessel = require('tessel');
 var ambient = require('ambient-attx4').use(tessel.port['B']);
+var servo = require('servo-pca9685').use(tessel.port['A']);
 
-const av = require('tessel-av');
-const camera = new av.Camera();
-const capture = camera.capture();
-// Clap --> pick up object -->  Doesn't take photo 
-// No clap --? pick up object --> trigger camera
+var servo1 = 1; // port that the servo is plugged in on
+var servo2 = 5;
+
+
 
 ambient.on('ready', function () {
  // Get points of light and sound data.
@@ -26,47 +26,53 @@ ambient.on('ready', function () {
  		ambient.getLightLevel( function(err, lightData) {
  			if (err) throw err;
  			if (lightData.toFixed(8) > lightThresh){
- 				if (!soundBool){
- 					capture.on('data', function(data) {
- 						fs.writeFile(path.join(__dirname, 'captures/captured-via-data-event.jpg'), data);
- 					});
- 					// Trigger the camera
+ 				if (soundBool){
+ 					console.log("You stole our food!");
+ 					console.log("BRIGHT", lightData.toFixed(8), "Sound info: Bool: ", soundBool, "Actual sound data: ", soundArr);
  				}
- 				console.log("BRIGHT", lightData.toFixed(8), "Sound info: Bool: ", soundBool, "Actual sound data: ", soundArr);
+ 				// servo.on('ready', function(){
+ 				// 	var pos = 0; 
+ 				// 	servo.configure(servo1, 0.05, 0.12, function(){
+ 				// 		servo.move(servo1, pos);
+ 				// 		pos += 0.1;
+ 				// 		if (pos > 1){
+ 				// 			pos = 0;
+ 				// 		}
+ 				// 	})
+ 				// })
  			}
  			else {
  				console.log("IT's too dark", lightData.toFixed(8), "Sound info: Bool: ", soundBool, "Actual sound data: ", soundArr);
  			}
+
  		});
- 	})}, 500); 
+ 	})
+
+ },500);
 });
 
-ambient.on('error', function (err) {
-	console.log(err)
-});
+// servo.on('ready', function () {
+// 	var position = 0;  
+// 	servo.configure(servo1, 0.05, 0.12, function () {
+// 		setInterval(function () {
+// 			console.log('Position (in range 0-1):', position);
 
-/* ambient-camera.js example */
-// this example records video from a camera
-// when a certain sound level is reached
-var tessel = require(‘tessel’);
-var http = require(‘http’);
-// set up camera
-var cameralib = require(‘camera-usb’);
-// set up ambient sensor on port A
-var ambient = require(‘ambient-attx4’).use(tessel.port[‘A’]);
-// set a sound trigger
-ambient.setSoundTrigger(0.6);
-cameralib.find(function(camera) {
-  // stream some video when sound is sensed
-  ambient.on(‘sound-trigger’, function(){
-  	var req = http.request({
-  		hostname: ‘example.com’,
-  		path: ‘/upload’,
-  		method: ‘POST’
-  	},
-  	function (res) {
-  		res.pipe(process.stdout)
-  	});
-  	camera.captureStream(2000, ‘mjpg’).pipe(req);
-  });
-});
+// 			servo.move(servo1, position);
+// 			servo.move(servo2, position);
+
+// 			position += 0.1;
+// 			if (position > 1) {
+//         		position = 0; // Reset servo position
+//         	}
+//     		}, 100); // Every 500 milliseconds
+
+// 	});
+// });
+
+
+// var base64String = new Buffer(dataToEx, 'hex').toString('base64')
+// modules.export = base64String;
+
+// ambient.on('error', function (err) {
+// 	console.log(err)
+// });
