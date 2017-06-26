@@ -5,7 +5,9 @@
   "main": "index.js",
   "dependencies": {
     "ambient-attx4": "^0.2.11",
-    "tessel": "^0.3.25"
+    "camera-usb": "^1.0.0",
+    "tessel": "^0.3.25",
+    "tessel-av": "^0.19.0"
   },
   "devDependencies": {},
   "scripts": {
